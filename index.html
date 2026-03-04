@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>生日快乐 · 专属惊喜 ✨</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'PingFang SC','Microsoft Yahei',sans-serif}
+body{background:linear-gradient(135deg,#ffc0d7,#fceaff,#e0d7ff);min-height:100vh;overflow-x:hidden;text-align:center;color:#333}
+.container{max-width:700px;margin:0 auto;padding:30px 20px;position:relative}
+/* 顶部卡片 */
+.card{background:rgba(255,255,255,0.95);border-radius:25px;padding:40px 30px;margin:20px 0;box-shadow:0 15px 35px rgba(0,0,0,0.1);animation:fadeUp 1s ease-out}
+h1{font-size:36px;color:#ff5e9a;margin-bottom:10px;animation:bounce 1.5s ease infinite alternate}
+/* 新增生日标题弹跳动画 */
+@keyframes bounce{from{transform:scale(1)}to{transform:scale(1.05)}}
+.name{font-size:28px;color:#222;margin:10px 0;font-weight:bold}
+.wish{font-size:18px;line-height:1.8;color:#555;margin:20px 0}
+/* 生日当天提示 */
+.birthday-tip{font-size:24px;color:#ff5e9a;font-weight:bold;margin:20px 0;text-shadow:0 0 10px rgba(255,94,154,0.5);animation:flash 1.5s ease infinite alternate}
+@keyframes flash{from{opacity:1}to{opacity:0.8}}
+/* 按钮 */
+.btn{background:#ff5e9a;color:white;border:none;border-radius:50px;padding:14px 32px;font-size:16px;margin:10px;cursor:pointer;transition:0.3s;box-shadow:0 5px 15px rgba(255,94,154,0.3)}
+.btn:hover{transform:scale(1.08);background:#ff3c83}
+/* 蜡烛 */
+.candle{width:60px;height:120px;margin:30px auto;position:relative;cursor:pointer}
+.flame{width:25px;height:35px;background:#ffaa00;border-radius:50% 50% 30% 30%;position:absolute;top:-25px;left:50%;transform:translateX(-50%);animation:flicker 1s infinite alternate}
+.candle-body{width:22px;height:100px;background:#fff;border-radius:5px;margin:0 auto}
+/* 动画 */
+@keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+@keyframes flicker{from{opacity:1;transform:translateX(-50%) scale(1)}to{opacity:0.8;transform:translateX(-50%) scale(1.1)}}
+/* 照片墙 */
+.photo-wall{display:grid;grid-template-columns:repeat(2,1fr);gap:15px;margin:30px 0}
+.photo{width:100%;height:160px;object-fit:cover;border-radius:15px;box-shadow:0 5px 15px rgba(0,0,0,0.1);transition:0.3s}
+.photo:hover{transform:scale(1.05);box-shadow:0 8px 20px rgba(0,0,0,0.2)}
+/* 彩蛋区 */
+.egg{margin:40px 0;font-size:17px;color:#777}
+/* 飘落特效（增强版） */
+.fall{position:fixed;top:0;pointer-events:none;z-index:999;animation:falling linear infinite}
+@keyframes falling{0%{transform:translateY(-10vh) rotate(0deg)}100%{transform:translateY(110vh) rotate(720deg)}}
+/* 新增：模态框样式 */
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:1000;justify-content:center;align-items:center}
+.modal-content{background:white;border-radius:20px;padding:40px;max-width:500px;width:90%;animation:popup 0.5s ease-out}
+@keyframes popup{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+.close-btn{background:#ff5e9a;color:white;border:none;border-radius:50%;width:30px;height:30px;font-size:18px;cursor:pointer;position:absolute;top:20px;right:20px}
+/* 新增：签名样式 */
+.signature{margin-top:30px;font-size:16px;color:#999;font-style:italic}
+/* 新增：音乐控制按钮 */
+.music-control{position:fixed;bottom:20px;right:20px;background:#ff5e9a;color:white;border:none;border-radius:50%;width:60px;height:60px;font-size:20px;cursor:pointer;box-shadow:0 5px 15px rgba(255,94,154,0.4);z-index:998}
+/* 响应式优化 */
+@media (max-width: 600px) {
+    .photo-wall{grid-template-columns:1fr}
+    h1{font-size:28px}
+    .name{font-size:24px}
+    .wish{font-size:16px}
+    .birthday-tip{font-size:20px}
+    .music-control{width:50px;height:50px;font-size:18px}
+}
+</style>
+</head>
+
+<body>
+<!-- 飘落元素 -->
+<div id="effects"></div>
+
+<!-- 音乐控制悬浮按钮 -->
+<button class="music-control" id="musicBtn" onclick="toggleMusic()">🎵</button>
+
+<div class="container">
+<div class="card">
+<h1>🎂 生日快乐！</h1>
+<div class="name">致我的朋友：郑海燕</div>
+<!-- 替换倒计时为生日当天专属提示 -->
+<div class="birthday-tip">🎉 今天是属于你的特别日子！生日快乐！🎉</div>
+<div class="wish">
+新的一岁，愿你被世界温柔以待，<br>
+平安喜乐，万事顺意，永远自由、永远闪亮，<br>
+想要的都拥有，得不到的都释怀，<br>
+眼里有光，心中有爱，一路春暖花开 ✨
+</div>
+
+<!-- 蜡烛 → 点击吹灭 -->
+<div class="candle" onclick="blow()">
+<div class="flame" id="flame"></div>
+<div class="candle-body"></div>
+</div>
+
+<button class="btn" onclick="showMsg()">打开专属祝福</button>
+<button class="btn" onclick="showPhotoModal()">查看专属回忆册</button>
+<button class="btn" onclick="playMusic()">播放生日歌</button>
+
+<!-- 签名 -->
+<div class="signature">—— 来自爱你的朋友</div>
+</div>
+
+<!-- 照片墙（可替换为你们的合照） -->
+<div class="photo-wall">
+<img src="https://picsum.photos/seed/birth1/400/300" class="photo" onclick="showBigPhoto('https://picsum.photos/seed/birth1/800/600')">
+<img src="https://picsum.photos/seed/birth2/400/300" class="photo" onclick="showBigPhoto('https://picsum.photos/seed/birth2/800/600')">
+<img src="https://picsum.photos/seed/birth3/400/300" class="photo" onclick="showBigPhoto('https://picsum.photos/seed/birth3/800/600')">
+<img src="https://picsum.photos/seed/birth4/400/300" class="photo" onclick="showBigPhoto('https://picsum.photos/seed/birth4/800/600')">
+</div>
+
+<div class="egg">💡 小彩蛋：多点几下蜡烛，有惊喜哦～</div>
+</div>
+
+<!-- 新增：照片模态框 -->
+<div class="modal" id="photoModal">
+<div class="modal-content" style="position:relative">
+<button class="close-btn" onclick="closeModal()">×</button>
+<h2 style="color:#ff5e9a;margin-bottom:20px">专属回忆册 📸</h2>
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+<img src="https://picsum.photos/seed/birth1/400/300" class="photo">
+<img src="https://picsum.photos/seed/birth2/400/300" class="photo">
+<img src="https://picsum.photos/seed/birth3/400/300" class="photo">
+<img src="https://picsum.photos/seed/birth4/400/300" class="photo">
+<img src="https://picsum.photos/seed/birth5/400/300" class="photo">
+<img src="https://picsum.photos/seed/birth6/400/300" class="photo">
+</div>
+</div>
+</div>
+
+<!-- 新增：大图查看模态框 -->
+<div class="modal" id="bigPhotoModal">
+<div class="modal-content" style="padding:20px">
+<button class="close-btn" onclick="closeBigPhotoModal()">×</button>
+<img id="bigPhotoImg" src="" style="width:100%;max-height:80vh;object-fit:contain;border-radius:10px">
+</div>
+</div>
+
+<!-- 音乐 -->
+<audio id="music" loop preload="auto">
+<source src="https://music.123ew.cc/mp3/20250809/1001.mp3" type="audio/mpeg">
+<source src="https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_1MB_MP3.mp3" type="audio/mpeg"> <!-- 备用链接 -->
+</audio>
+
+<script>
+// 页面加载立即触发生日庆祝特效
+window.onload = function() {
+    createCelebration(); // 立即生成大量庆祝特效
+    // 自动尝试播放音乐（需用户交互后生效）
+    setTimeout(() => {
+        try {
+            document.getElementById('music').play();
+            isMusicPlaying = true;
+            document.getElementById('musicBtn').innerText = '⏸️';
+        } catch (e) {
+            // 静默失败，等待用户点击
+        }
+    }, 1000);
+};
+
+// 1. 飘落特效增强版（生日当天更密集）
+let effectTimer;
+function createFall(){
+    if(document.hidden) return;
+    
+    const ef=document.getElementById('effects');
+    const em=['🎈','🎂','❤️','✨','🎁','🌸','⭐','🧸','🍰','🎊','🥳']; // 新增生日元素
+    const div=document.createElement('div');
+    div.className='fall';
+    div.innerText=em[Math.floor(Math.random()*em.length)];
+    div.style.left=Math.random()*100+'vw';
+    div.style.fontSize=20+Math.random()*25+'px'; // 更大的特效元素
+    div.style.animationDuration=3+Math.random()*5+'s'; // 更快的飘落速度
+    ef.appendChild(div);
+    setTimeout(()=>div.remove(),8000);
+}
+
+// 生日当天特效频率翻倍
+effectTimer = setInterval(createFall, 250);
+document.addEventListener('visibilitychange', () => {
+    if(document.hidden){
+        clearInterval(effectTimer);
+    }else{
+        effectTimer = setInterval(createFall, 250);
+    }
+});
+
+// 2. 吹蜡烛 - 生日专属彩蛋
+let candleClickCount = 0;
+function blow(){
+    const f=document.getElementById('flame');
+    f.style.opacity='0';
+    
+    candleClickCount++;
+    // 生日当天专属祝福语
+    let msg = '';
+    if(candleClickCount === 1){
+        msg = '✨ 吹灭蜡烛，许下心愿，新的一岁一定会超棒的！';
+    }else if(candleClickCount === 3){
+        msg = '🎊 生日快乐！愿你岁岁常欢愉，年年皆胜意！';
+        createFallBurst(30); // 生成更多特效
+    }else if(candleClickCount === 5){
+        msg = '💖 郑海燕专属惊喜：新的一岁，暴富暴美暴开心！生日快乐！';
+        createFallBurst(50); // 大量特效爆发
+    }else if(candleClickCount === 8){
+        msg = '🥳 解锁终极惊喜：愿你永远被爱包围，生日快乐！';
+        createFallBurst(80);
+    }else{
+        msg = '🎂 生日快乐！所有美好都会如约而至～';
+    }
+    
+    setTimeout(()=>{
+        f.style.opacity='1';
+        alert(msg);
+    },300);
+}
+
+// 3. 专属祝福弹窗 - 生日当天版本
+function showMsg(){
+    const birthdayWishes = [
+        '亲爱的海燕，生日快乐！🥳\n今天是属于你的高光时刻，愿你永远闪闪发光，快乐不止今天～❤️',
+        '海燕宝，生日快乐！🎂\n新的一岁，愿生活处处是惊喜，温柔且坚定，知足且上进～✨',
+        '祝我们超可爱的海燕生日快乐！🎁\n愿你想要的都拥有，做的梦都实现，新的一岁继续乘风破浪～'
+    ];
+    const randomWish = birthdayWishes[Math.floor(Math.random() * birthdayWishes.length)];
+    alert(randomWish);
+}
+
+// 4. 音乐控制
+let isMusicPlaying = false;
+function playMusic(){
+    const audio = document.getElementById('music');
+    try {
+        if(isMusicPlaying){
+            audio.pause();
+            isMusicPlaying = false;
+            document.getElementById('musicBtn').innerText = '🎵';
+            alert('🎶 生日歌暂时休息啦，随时可以再播放哦～');
+        }else{
+            audio.play();
+            isMusicPlaying = true;
+            document.getElementById('musicBtn').innerText = '⏸️';
+            alert('🎵 生日快乐歌已播放，祝郑海燕生日快乐！🎂');
+        }
+    } catch (e) {
+        alert('🎵 点击页面任意位置后再试一次，让我们一起为海燕唱生日歌～');
+    }
+}
+
+// 切换音乐播放状态
+function toggleMusic(){
+    playMusic();
+}
+
+// 5. 照片模态框
+function showPhotoModal(){
+    document.getElementById('photoModal').style.display = 'flex';
+    createFallBurst(20); // 打开时生成特效
+}
+
+function closeModal(){
+    document.getElementById('photoModal').style.display = 'none';
+}
+
+// 6. 查看大图
+function showBigPhoto(src){
+    document.getElementById('bigPhotoImg').src = src;
+    document.getElementById('bigPhotoModal').style.display = 'flex';
+}
+
+function closeBigPhotoModal(){
+    document.getElementById('bigPhotoModal').style.display = 'none';
+}
+
+// 7. 批量生成庆祝特效
+function createFallBurst(num = 20){
+    for(let i=0; i<num; i++){
+        createFall();
+    }
+}
+
+// 8. 生日当天大规模庆祝特效
+function createCelebration(){
+    createFallBurst(50); // 页面加载时生成50个特效
+    // 每隔10秒自动生成一波小特效
+    setInterval(() => {
+        createFallBurst(10);
+    }, 10000);
+}
+
+// 点击页面解锁音乐
+document.addEventListener('click', () => {
+    const audio = document.getElementById('music');
+    if(!isMusicPlaying && audio.paused){
+        audio.load();
+    }
+}, { once: true });
+
+// ESC关闭模态框
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape'){
+        closeModal();
+        closeBigPhotoModal();
+    }
+});
+</script>
+</body>
+</html>
